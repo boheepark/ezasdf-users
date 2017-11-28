@@ -19,85 +19,59 @@ class TestUserService(BaseTestCase):
         self.assertIn('success', data['status'])
 
     def test_add_user(self):
-        """Ensure a new user can be added to the database."""
         with self.client:
-            res = self.client.post(
-                '/users',
-                data=json.dumps(dict(
-                    username='test',
-                    email='test@test.com'
-                )),
-                content_type='application/json',
-            )
+            res = self.client.post('/users', data=json.dumps({
+                "username": "test",
+                "email": "test@test.com"
+            }), content_type='application/json')
             data = json.loads(res.data.decode())
             self.assertEqual(res.status_code, 201)
             self.assertIn('test@test.com was added!', data['message'])
             self.assertIn('success', data['status'])
 
-    def test_add_user_empty(self):
-        """Ensure error is thrown if the JSON object is empty."""
+    def test_add_empty_user(self):
         with self.client:
-            res = self.client.post(
-                '/users',
-                data=json.dumps(dict()),
-                content_type='application/json',
-            )
+            res = self.client.post('/users', data=json.dumps({}), content_type='application/json')
             data = json.loads(res.data.decode())
             self.assertEqual(res.status_code, 400)
             self.assertIn('Invalid payload.', data['message'])
             self.assertIn('fail', data['status'])
 
-    def test_add_user_no_username(self):
-        """Ensure error is thrown if the JSON object does not have a username key."""
+    def test_add_user_with_no_username(self):
         with self.client:
-            res = self.client.post(
-                '/users',
-                data=json.dumps(dict(email='test@test.com')),
-                content_type='application/json',
-            )
+            res = self.client.post('/users', data=json.dumps({'email': 'test@test.com'}), content_type='application/json')
             data = json.loads(res.data.decode())
             self.assertEqual(res.status_code, 400)
             self.assertIn('Invalid payload.', data['message'])
             self.assertIn('fail', data['status'])
 
-    def test_add_user_duplicate_user(self):
-        """Ensure error is thrown if the email already exists."""
+    def test_add_duplicate_user(self):
         with self.client:
-            self.client.post(
-                '/users',
-                data=json.dumps(dict(
-                    username='test',
-                    email='test@test.com'
-                )),
-                content_type='application/json',
-            )
-            res = self.client.post(
-                '/users',
-                data=json.dumps(dict(
-                    username='test',
-                    email='test@test.com'
-                )),
-                content_type='application/json',
-            )
+            self.client.post('/users', data=json.dumps({
+                "username": "test",
+                "email": "test@test.com"
+            }), content_type='application/json')
+            res = self.client.post('/users', data=json.dumps({
+                "username": "test",
+                "email": "test@test.com"
+            }), content_type='application/json')
             data = json.loads(res.data.decode())
             self.assertEqual(res.status_code, 400)
             self.assertIn('Sorry. That email already exists.', data['message'])
             self.assertIn('fail', data['status'])
 
-    def test_single_user(self):
-        """Ensure get single user behaves correctly."""
+    def test_get_user(self):
         new_user = add_user('test', 'test@test.com')
         with self.client:
             res = self.client.get(f'/users/{new_user.id}')
             data = json.loads(res.data.decode())
             self.assertEqual(res.status_code, 200)
-            self.assertTrue('created_at' in data['data'])
+            self.assertIn('created_at', data['data'])
             self.assertIn('test', data['data']['username'])
             self.assertIn('test@test.com', data['data']['email'])
             self.assertIn('success', data['status'])
 
-    def test_single_user_no_id(self):
-        """Ensure error is thrown if an id is not provided."""
+    def test_get_user_bad_id(self):
         with self.client:
             res = self.client.get('/users/blah')
             data = json.loads(res.data.decode())
@@ -105,17 +79,7 @@ class TestUserService(BaseTestCase):
             self.assertIn('User does not exist', data['message'])
             self.assertIn('fail', data['status'])
 
-    def test_single_user_incorrect_id(self):
-        """Ensure error is thrown if the id does not exist."""
-        with self.client:
-            res = self.client.get('/users/999')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 404)
-            self.assertIn('User does not exist', data['message'])
-            self.assertIn('fail', data['status'])
-
-    def test_all_users(self):
-        """Ensure get all users behaves correctly."""
+    def test_get_users(self):
         add_user('test', 'test@test.com')
         add_user('test2', 'test2@test.com')
         with self.client:

@@ -5,16 +5,8 @@ from project import db
 
 users_blueprint = Blueprint('users', __name__)
 
-@users_blueprint.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify({
-        'status': 'success',
-        'message': 'pong!'
-    })
-
 @users_blueprint.route('/users', methods=['GET'])
 def get_all_users():
-    """Get all users"""
     users = User.query.all()
     users_list = []
     for user in users:
@@ -33,14 +25,14 @@ def get_all_users():
 
 @users_blueprint.route('/users', methods=['POST'])
 def add_user():
-    post_data = request.get_json()
-    if not post_data:
+    data = request.get_json()
+    if not data:
         return jsonify({
             'status': 'fail',
             'message': 'Invalid payload.'
         }), 400
-    username = post_data.get('username')
-    email = post_data.get('email')
+    username = data.get('username')
+    email = data.get('email')
     try:
         user = User.query.filter_by(email=email).first()
         if not user:
@@ -64,7 +56,6 @@ def add_user():
 
 @users_blueprint.route('/users/<user_id>', methods=['GET'])
 def get_single_user(user_id):
-    """Get single user details"""
     try:
         user = User.query.filter_by(id=int(user_id)).first()
         if not user:
