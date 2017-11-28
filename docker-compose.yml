@@ -1,0 +1,11 @@
+version: '2.1'
+
+services:
+
+  flaskreact-service:
+    container_name: flaskreact-service
+    build: .
+    volumes:
+      - '.:/usr/src/app'
+    ports:
+      - 5001:5000 # expose ports - HOST:CONTAINER
