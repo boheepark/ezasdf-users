@@ -1,14 +1,10 @@
 import unittest
 from flask_script import Manager
-from project import app, db
+from project import create_app, db
+from project.api.models import User
 
+app = create_app()
 manager = Manager(app)
-
-@manager.command
-def recreate_db():
-    db.drop_all()
-    db.create_all()
-    db.session.commit()
 
 @manager.command
 def test():
@@ -18,6 +14,19 @@ def test():
     if result.wasSuccessful():
         return 0
     return 1
+
+@manager.command
+def seed_db():
+    """Seeds the database."""
+    db.session.add(User(username='test', email="test@test.com"))
+    db.session.add(User(username='test2', email="test2@test.com"))
+    db.session.commit()
+
+@manager.command
+def recreate_db():
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
 
 if __name__ == "__main__":
     manager.run()
