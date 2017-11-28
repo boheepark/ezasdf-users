@@ -11,13 +11,6 @@ def add_user(username, email):
 
 class TestUserService(BaseTestCase):
 
-    def test_users(self):
-        res = self.client.get('/ping')
-        data = json.loads(res.data.decode())
-        self.assertEqual(res.status_code, 200)
-        self.assertIn('pong!', data['message'])
-        self.assertIn('success', data['status'])
-
     def test_add_user(self):
         with self.client:
             res = self.client.post('/users', data=json.dumps({
