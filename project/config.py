@@ -4,6 +4,7 @@ class BaseConfig:
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = "asdf"
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
