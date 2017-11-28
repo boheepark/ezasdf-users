@@ -1,13 +1,30 @@
 version: '2.1'
 
 services:
+  flaskreact-db:
+    container_name: flaskreact-db
+    build: ./project/db
+    ports:
+      - 5435:5432 # expose ports - HOST:CONTAINER
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: exit 0
 
   flaskreact-service:
     container_name: flaskreact-service
-    build: .
+    build: ./
     volumes:
       - '.:/usr/src/app'
     ports:
       - 5001:5000 # expose ports - HOST:CONTAINER
     environment:
       - APP_SETTINGS=project.config.DevelopmentConfig
+      - DATABASE_URL=postgres://postgres:postgres@flaskreact-db:5432/flaskreact_dev
+      - DATABASE_TEST_URL=postgres://postgres:postgres@flaskreact-db:5432/flaskreact_test
+    depends_on:
+      flaskreact-db:
+        condition: service_healthy
+    links:
+      - flaskreact-db
