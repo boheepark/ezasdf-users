@@ -15,8 +15,8 @@ services:
   flaskreact-service:
     container_name: flaskreact-service
     build: ./
-    ports:
-      - 5001:5000 # expose ports - HOST:CONTAINER
+    expose:
+      - '5000'
     environment:
       - APP_SETTINGS=project.config.ProductionConfig
       - DATABASE_URL=postgres://postgres:postgres@flaskreact-db:5432/flaskreact_prod
