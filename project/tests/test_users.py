@@ -11,6 +11,33 @@ def add_user(username, email):
 
 class TestUserService(BaseTestCase):
 
+    def test_main_no_users(self):
+        res = self.client.get('/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h1>All Users</h1>', res.data)
+        self.assertIn(b'<p>No users!</p>', res.data)
+
+    def test_main_with_users(self):
+        add_user('test', 'test@test.com')
+        add_user('test2', 'test2@test.com')
+        res = self.client.get('/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'<h1>All Users</h1>', res.data)
+        self.assertNotIn(b'<p>No users!</p>', res.data)
+        self.assertIn(b'<strong>test</strong>', res.data)
+        self.assertIn(b'<strong>test2</strong>', res.data)
+
+    def test_main_add_user(self):
+        with self.client:
+            res = self.client.post('/', data={
+                'username': 'test',
+                'email': 'test@test.com'
+            }, follow_redirects=True)
+            self.assertEqual(res.status_code, 200)
+            self.assertIn(b'<h1>All Users</h1>', res.data)
+            self.assertNotIn(b'<p>No users!</p>', res.data)
+            self.assertIn(b'<strong>test</strong>', res.data)
+
     def test_add_user(self):
         with self.client:
             res = self.client.post('/users', data=json.dumps({
