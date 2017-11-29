@@ -1,8 +1,8 @@
 version: '2.1'
 
 services:
-  flaskreact-db:
-    container_name: flaskreact-db
+  users-db:
+    container_name: users-db
     build: ./project/db
     ports:
       - 5435:5432 # expose ports - HOST:CONTAINER
@@ -12,20 +12,20 @@ services:
     healthcheck:
       test: exit 0
 
-  flaskreact-service:
-    container_name: flaskreact-service
+  users-service:
+    container_name: users-service
     build: ./
     expose:
       - '5000'
     environment:
       - APP_SETTINGS=project.config.ProductionConfig
-      - DATABASE_URL=postgres://postgres:postgres@flaskreact-db:5432/flaskreact_prod
-      - DATABASE_TEST_URL=postgres://postgres:postgres@flaskreact-db:5432/flaskreact_test
+      - DATABASE_URL=postgres://postgres:postgres@users-db:5432/users_prod
+      - DATABASE_TEST_URL=postgres://postgres:postgres@users-db:5432/users_test
     depends_on:
-      flaskreact-db:
+      users-db:
         condition: service_healthy
     links:
-      - flaskreact-db
+      - users-db
     command: gunicorn -b 0.0.0.0:5000 manage:app
 
   nginx:
@@ -35,7 +35,7 @@ services:
     ports:
       - 80:80
     depends_on:
-      flaskreact-service:
+      users-service:
         condition: service_started
     links:
-      - flaskreact-service
+      - users-service

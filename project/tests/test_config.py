@@ -15,7 +15,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertEqual(app.config['SECRET_KEY'], 'asdf')
         self.assertTrue(app.config['DEBUG'])
         self.assertIsNotNone(current_app)
-        self.assertEqual(app.config['SQLALCHEMY_DATABASE_URI'], 'postgres://postgres:postgres@flaskreact-db:5432/flaskreact_dev')
+        self.assertEqual(app.config['SQLALCHEMY_DATABASE_URI'], 'postgres://postgres:postgres@users-db:5432/users_dev')
 
 
 class TestTestingConfig(TestCase):
@@ -28,7 +28,7 @@ class TestTestingConfig(TestCase):
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(app.config['TESTING'])
         self.assertFalse(app.config['PRESERVE_CONTEXT_ON_EXCEPTION'])
-        self.assertEqual(app.config['SQLALCHEMY_DATABASE_URI'], 'postgres://postgres:postgres@flaskreact-db:5432/flaskreact_test')
+        self.assertEqual(app.config['SQLALCHEMY_DATABASE_URI'], 'postgres://postgres:postgres@users-db:5432/users_test')
 
 
 class TestProductionConfig(TestCase):

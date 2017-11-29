@@ -1,3 +1,3 @@
-CREATE DATABASE flaskreact_prod;
-CREATE DATABASE flaskreact_dev;
-CREATE DATABASE flaskreact_test;
+CREATE DATABASE users_prod;
+CREATE DATABASE users_dev;
+CREATE DATABASE users_test;
