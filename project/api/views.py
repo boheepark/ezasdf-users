@@ -5,19 +5,10 @@ from project import db
 
 users_blueprint = Blueprint('users', __name__, template_folder='./templates')
 
-@users_blueprint.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        db.session.add(User(username=username, email=email))
-        db.session.commit()
-    users = User.query.order_by(User.created_at.desc()).all()
-    return render_template('index.html', users=users)
-
 @users_blueprint.route('/users', methods=['GET'])
 def get_all_users():
-    users = User.query.all()
+    users = User.query.order_by(User.created_at.desc()).all()
+    #TODO use serialize
     users_list = []
     for user in users:
         users_list.append({

@@ -1,116 +1,84 @@
 import json
+import datetime
 from project import db
 from project.api.models import User
 from project.tests.base import BaseTestCase
 
-def add_user(username, email):
-    new_user = User(username=username, email=email)
+def add_user(username, email, created_at=datetime.datetime.now()):
+    new_user = User(username=username, email=email, created_at=created_at)
     db.session.add(new_user)
     db.session.commit()
     return new_user
 
 class TestUserService(BaseTestCase):
 
-    def test_main_no_users(self):
-        res = self.client.get('/')
-        self.assertEqual(res.status_code, 200)
-        self.assertIn(b'<h1>All Users</h1>', res.data)
-        self.assertIn(b'<p>No users!</p>', res.data)
-
-    def test_main_with_users(self):
-        add_user('test', 'test@test.com')
-        add_user('test2', 'test2@test.com')
-        res = self.client.get('/')
-        self.assertEqual(res.status_code, 200)
-        self.assertIn(b'<h1>All Users</h1>', res.data)
-        self.assertNotIn(b'<p>No users!</p>', res.data)
-        self.assertIn(b'<strong>test</strong>', res.data)
-        self.assertIn(b'<strong>test2</strong>', res.data)
-
-    def test_main_add_user(self):
-        with self.client:
-            res = self.client.post('/', data={
-                'username': 'test',
-                'email': 'test@test.com'
-            }, follow_redirects=True)
-            self.assertEqual(res.status_code, 200)
-            self.assertIn(b'<h1>All Users</h1>', res.data)
-            self.assertNotIn(b'<p>No users!</p>', res.data)
-            self.assertIn(b'<strong>test</strong>', res.data)
-
     def test_add_user(self):
-        with self.client:
-            res = self.client.post('/users', data=json.dumps({
-                "username": "test",
-                "email": "test@test.com"
-            }), content_type='application/json')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 201)
-            self.assertIn('test@test.com was added!', data['message'])
-            self.assertIn('success', data['status'])
+        res = self.client.post('/users', data=json.dumps({
+            "username": "test",
+            "email": "test@test.com"
+        }), content_type='application/json')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 201)
+        self.assertIn('test@test.com was added!', data['message'])
+        self.assertIn('success', data['status'])
 
     def test_add_empty_user(self):
-        with self.client:
-            res = self.client.post('/users', data=json.dumps({}), content_type='application/json')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 400)
-            self.assertIn('Invalid payload.', data['message'])
-            self.assertIn('fail', data['status'])
+        res = self.client.post('/users', data=json.dumps({}), content_type='application/json')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('Invalid payload.', data['message'])
+        self.assertIn('fail', data['status'])
 
     def test_add_user_with_no_username(self):
-        with self.client:
-            res = self.client.post('/users', data=json.dumps({'email': 'test@test.com'}), content_type='application/json')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 400)
-            self.assertIn('Invalid payload.', data['message'])
-            self.assertIn('fail', data['status'])
+        res = self.client.post('/users', data=json.dumps({'email': 'test@test.com'}), content_type='application/json')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('Invalid payload.', data['message'])
+        self.assertIn('fail', data['status'])
 
     def test_add_duplicate_user(self):
-        with self.client:
-            self.client.post('/users', data=json.dumps({
-                "username": "test",
-                "email": "test@test.com"
-            }), content_type='application/json')
-            res = self.client.post('/users', data=json.dumps({
-                "username": "test",
-                "email": "test@test.com"
-            }), content_type='application/json')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 400)
-            self.assertIn('Sorry. That email already exists.', data['message'])
-            self.assertIn('fail', data['status'])
+        self.client.post('/users', data=json.dumps({
+            "username": "test",
+            "email": "test@test.com"
+        }), content_type='application/json')
+        res = self.client.post('/users', data=json.dumps({
+            "username": "test",
+            "email": "test@test.com"
+        }), content_type='application/json')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 400)
+        self.assertIn('Sorry. That email already exists.', data['message'])
+        self.assertIn('fail', data['status'])
 
     def test_get_user(self):
         new_user = add_user('test', 'test@test.com')
-        with self.client:
-            res = self.client.get(f'/users/{new_user.id}')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 200)
-            self.assertIn('created_at', data['data'])
-            self.assertIn('test', data['data']['username'])
-            self.assertIn('test@test.com', data['data']['email'])
-            self.assertIn('success', data['status'])
+        res = self.client.get(f'/users/{new_user.id}')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('created_at', data['data'])
+        self.assertIn('test', data['data']['username'])
+        self.assertIn('test@test.com', data['data']['email'])
+        self.assertIn('success', data['status'])
 
     def test_get_user_bad_id(self):
-        with self.client:
-            res = self.client.get('/users/blah')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 404)
-            self.assertIn('User does not exist', data['message'])
-            self.assertIn('fail', data['status'])
+        res = self.client.get('/users/blah')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 404)
+        self.assertIn('User does not exist', data['message'])
+        self.assertIn('fail', data['status'])
 
     def test_get_users(self):
-        add_user('test', 'test@test.com')
+        created = datetime.datetime.now() + datetime.timedelta(-30)
+        add_user('test', 'test@test.com', created)
         add_user('test2', 'test2@test.com')
-        with self.client:
-            res = self.client.get('/users')
-            data = json.loads(res.data.decode())
-            self.assertEqual(res.status_code, 200)
-            self.assertEqual(len(data['data']['users']), 2)
-            self.assertIn('created_at', data['data']['users'][0])
-            self.assertIn('created_at', data['data']['users'][1])
-            self.assertIn('test', data['data']['users'][0]['username'])
-            self.assertIn('test@test.com', data['data']['users'][0]['email'])
-            self.assertIn('test2', data['data']['users'][1]['username'])
-            self.assertIn('test2@test.com', data['data']['users'][1]['email'])
-            self.assertIn('success', data['status'])
+        res = self.client.get('/users')
+        data = json.loads(res.data.decode())
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(data['data']['users']), 2)
+        self.assertIn('created_at', data['data']['users'][0])
+        self.assertIn('created_at', data['data']['users'][1])
+        self.assertIn('test', data['data']['users'][1]['username'])
+        self.assertIn('test@test.com', data['data']['users'][1]['email'])
+        self.assertIn('test2', data['data']['users'][0]['username'])
+        self.assertIn('test2@test.com', data['data']['users'][0]['email'])
+        self.assertIn('success', data['status'])
