@@ -100,8 +100,9 @@ ENV/
 # mypy
 .mypy_cache/
 
-# pycharm
-.idea
+# intellij
+.idea/
+projectFilesBackup/
 
 # coverage
 htmlcov/
