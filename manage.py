@@ -48,8 +48,8 @@ def test():
 @manager.command
 def seed_db():
     """ Seeds the database with sample data. """
-    db.session.add(User(username='test', email='test@test.com', password='test'))
-    db.session.add(User(username='test2', email='test2@test.com', password='test'))
+    db.session.add(User(username='test', email='test@test.com', password='password'))
+    db.session.add(User(username='test2', email='test2@test.com', password='password'))
     db.session.commit()
 
 
