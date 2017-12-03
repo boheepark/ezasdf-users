@@ -46,7 +46,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
 
-    def test_add_empty_user(self):
+    def test_post_users_empty(self):
         """ Verify adding an empty user throws an error. """
         with self.client:
             response = self.client.post(
@@ -60,7 +60,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_user_no_username(self):
+    def test_post_users_no_username(self):
         """ Verify adding a user without a username throws an error. """
         with self.client:
             response = self.client.post(
@@ -76,7 +76,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_user_no_email(self):
+    def test_post_users_no_email(self):
         """ Verify adding a user without an email throws an error. """
         with self.client:
             response = self.client.post(
@@ -93,7 +93,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_user_no_password(self):
+    def test_post_users_no_password(self):
         """ Verify adding a user without a password throws an error. """
         with self.client:
             response = self.client.post(
@@ -110,7 +110,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_duplicate_user(self):
+    def test_post_users_duplicate(self):
         """ Verify adding a duplicate user throws an error. """
         with self.client:
             self.client.post(
@@ -137,7 +137,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_duplicate_username(self):
+    def test_post_users_duplicate_username(self):
         """ Verify adding a user with a duplicate username throws an error. """
         with self.client:
             self.client.post(
@@ -164,7 +164,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_add_duplicate_email(self):
+    def test_post_users_duplicate_email(self):
         """ Verify adding a user with a duplicate email throws an error. """
         with self.client:
             self.client.post(
@@ -191,7 +191,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_get_user_by_id(self):
+    def test_get_users_by_id(self):
         """ Verify GET request to /users/{user_id} returns a user. """
         new_user = add_user('test', 'test@test.com', 'password')
         with self.client:
@@ -205,7 +205,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert200(response)
 
-    def test_get_user_invalid_id(self):
+    def test_get_users_invalid_id(self):
         """ Verify not existing id throws an error. """
         with self.client:
             response = self.client.get('/users/999')
@@ -215,7 +215,7 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert404(response)
 
-    def test_get_user_invalid_id_value(self):
+    def test_get_users_invalid_id_value(self):
         """ Verify requesting id 'blah' throws an error. """
         with self.client:
             response = self.client.get('/users/blah')
