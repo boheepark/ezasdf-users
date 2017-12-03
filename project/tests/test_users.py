@@ -14,18 +14,21 @@ class TestUsersBlueprint(BaseTestCase):
         add_user('test2', 'test2@test.com', 'test')
         with self.client:
             response = self.client.get('/users')
-            self.assert200(response)
             data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'success')
+            self.assertEqual(data['message'], 'Users retrieved.')
             self.assertEqual(len(data['data']['users']), 2)
+            self.assertEqual(data['data']['users'][1]['username'], 'test')
+            self.assertEqual(data['data']['users'][1]['email'], 'test@test.com')
+            self.assertEqual(data['data']['users'][0]['username'], 'test2')
+            self.assertEqual(data['data']['users'][0]['email'], 'test2@test.com')
             self.assertIn('created_at', data['data']['users'][0])
             self.assertIn('created_at', data['data']['users'][1])
-            self.assertEqual('test', data['data']['users'][1]['username'])
-            self.assertEqual('test@test.com', data['data']['users'][1]['email'])
-            self.assertEqual('test2', data['data']['users'][0]['username'])
-            self.assertEqual('test2@test.com', data['data']['users'][0]['email'])
-            self.assertEqual('success', data['status'])
+            self.assertEqual(response.content_type, 'application/json')
 
-    def test_add_user(self):
+            self.assert200(response)
+
+    def test_post_users(self):
         """ Verify POST request to /users adds a new user to the database. """
         with self.client:
             response = self.client.post(
@@ -33,14 +36,15 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
-            self.assertEqual(response.status_code, 201)
             data = json.loads(response.data.decode())
-            self.assertEqual('test@test.com was added!', data['message'])
-            self.assertEqual('success', data['status'])
+            self.assertEqual(data['message'], 'test@test.com was added!')
+            self.assertEqual(data['status'], 'success')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assertEqual(response.status_code, 201)
 
     def test_add_empty_user(self):
         """ Verify adding an empty user throws an error. """
@@ -50,10 +54,11 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({}),
                 content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertEqual('Invalid payload.', data['message'])
-            self.assertEqual('fail', data['status'])
+            self.assertEqual(data['message'], 'Invalid payload.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_user_no_username(self):
         """ Verify adding a user without a username throws an error. """
@@ -62,13 +67,14 @@ class TestUsersBlueprint(BaseTestCase):
                 '/users',
                 data=json.dumps({
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }), content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertIn('Invalid payload.', data['message'])
-            self.assertIn('fail', data['status'])
+            self.assertEqual(data['message'], 'Invalid payload.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_user_no_email(self):
         """ Verify adding a user without an email throws an error. """
@@ -77,14 +83,15 @@ class TestUsersBlueprint(BaseTestCase):
                 '/users',
                 data=json.dumps({
                     'username': 'test',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertIn('Invalid payload.', data['message'])
-            self.assertIn('fail', data['status'])
+            self.assertEqual(data['message'], 'Invalid payload.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_user_no_password(self):
         """ Verify adding a user without a password throws an error. """
@@ -97,10 +104,11 @@ class TestUsersBlueprint(BaseTestCase):
                 }),
                 content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertIn('Invalid payload.', data['message'])
-            self.assertIn('fail', data['status'])
+            self.assertEqual(data['message'], 'Invalid payload.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_duplicate_user(self):
         """ Verify adding a duplicate user throws an error. """
@@ -110,7 +118,7 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
@@ -119,14 +127,15 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertIn('That user already exists.', data['message'])
-            self.assertIn('fail', data['status'])
+            self.assertEqual(data['message'], 'User already exists.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_duplicate_username(self):
         """ Verify adding a user with a duplicate username throws an error. """
@@ -136,7 +145,7 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
@@ -145,14 +154,15 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test2@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
-            self.assert400(response)
             data = json.loads(response.data.decode())
-            self.assertIn('That user already exists.', data['message'])
-            self.assertIn('fail', data['status'])
+            self.assertEqual(data['message'], 'User already exists.')
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert400(response)
 
     def test_add_duplicate_email(self):
         """ Verify adding a user with a duplicate email throws an error. """
@@ -162,7 +172,7 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
@@ -171,32 +181,47 @@ class TestUsersBlueprint(BaseTestCase):
                 data=json.dumps({
                     'username': 'test2',
                     'email': 'test@test.com',
-                    'password': 'test'
+                    'password': 'password'
                 }),
                 content_type='application/json'
             )
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(data['message'], 'User already exists.')
+            self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
-            data = json.loads(response.data.decode())
-            self.assertIn('That user already exists.', data['message'])
-            self.assertIn('fail', data['status'])
-
-    def test_get_user_invalid_id(self):
-        """ Verify requesting id 'blah' throws an error. """
-        with self.client:
-            response = self.client.get('/users/blah')
-            self.assert404(response)
-            data = json.loads(response.data.decode())
-            self.assertIn('User does not exist', data['message'])
-            self.assertIn('fail', data['status'])
 
     def test_get_user_by_id(self):
         """ Verify GET request to /users/{user_id} returns a user. """
-        new_user = add_user('test', 'test@test.com', 'test')
+        new_user = add_user('test', 'test@test.com', 'password')
         with self.client:
             response = self.client.get(f'/users/{new_user.id}')
-            self.assert200(response)
             data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'success')
+            self.assertEqual(data['message'], f'User {new_user.id} retrieved.')
+            self.assertEqual(data['data']['username'], 'test')
+            self.assertEqual(data['data']['email'], 'test@test.com')
             self.assertIn('created_at', data['data'])
-            self.assertIn('test', data['data']['username'])
-            self.assertIn('test@test.com', data['data']['email'])
-            self.assertIn('success', data['status'])
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert200(response)
+
+    def test_get_user_invalid_id(self):
+        """ Verify not existing id throws an error. """
+        with self.client:
+            response = self.client.get('/users/999')
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(data['message'], 'User does not exist.')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert404(response)
+
+    def test_get_user_invalid_id_value(self):
+        """ Verify requesting id 'blah' throws an error. """
+        with self.client:
+            response = self.client.get('/users/blah')
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(data['message'], 'User does not exist.')
+            self.assertEqual(response.content_type, 'application/json')
+            self.assert404(response)
+
