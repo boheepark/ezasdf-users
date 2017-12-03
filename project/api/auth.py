@@ -51,7 +51,7 @@ def post_signin():
             if auth_token:
                 return success_response(
                     f'{username} signed in.',
-                    data={ 'auth_token': auth_token.decode() }
+                    data={'auth_token': auth_token.decode()}
                 ), 200
         return error_response('User does not exist.'), 404
     except Exception as e:
@@ -85,19 +85,19 @@ def get_status():
     """
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        auth_token = auth_header.split(" ")[1]
+        auth_token = auth_header[7:]
         id = User.decode_auth_token(auth_token)
         if not isinstance(id, str):
             user = User.query.filter_by(id=id).first()
-            return jsonify({
-                'status': 'success',
-                'data': {
+            return success_response(
+                f'Retrieved {user.username}\'s status',
+                data={
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
                     'active': user.active,
                     'created_at': user.created_at
                 }
-            }), 200
+            ), 200
         return error_response(id), 401
     return error_response('Provide a valid auth token.'), 401
