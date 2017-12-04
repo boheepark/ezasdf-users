@@ -11,8 +11,11 @@ auth_blueprint = Blueprint('auth', __name__)
 @auth_blueprint.route('/auth/signup', methods=['POST'])
 def post_signup():
     """ POST /auth/signup
-    :return: json
+    Signs up the new user.
+
+    :return: flask response
     """
+
     data = request.get_json()
     if not data:
         return error_response(), 400
@@ -23,10 +26,10 @@ def post_signup():
     try:
         if not User.query.filter(or_(User.username == username, User.email == email)).first():
             new_user = add_user(username, email, password)
-            auth_token = new_user.encode_auth_token(new_user.id)
+            token = new_user.encode_jwt(new_user.id)
             return success_response(
-                f'{username} signed up.',
-                data={ 'auth_token': auth_token.decode() }
+                f'User {username} signed up.',
+                data={ 'token': token.decode() }
             ), 201
         return error_response('User already exists.'), 400
     except (exc.IntegrityError, ValueError) as e:
@@ -37,8 +40,11 @@ def post_signup():
 @auth_blueprint.route('/auth/signin', methods=['POST'])
 def post_signin():
     """ POST /auth/signin
-    :return: json
+    Signs in the user and fetches the user's token.
+
+    :return: A Flask Response
     """
+
     data = request.get_json()
     if not data:
         return error_response(), 400
@@ -47,11 +53,11 @@ def post_signin():
     try:
         user = User.query.filter_by(username=username).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            auth_token = user.encode_auth_token(user.id)
-            if auth_token:
+            token = user.encode_jwt(user.id)
+            if token:
                 return success_response(
-                    f'{username} signed in.',
-                    data={'auth_token': auth_token.decode()}
+                    f'User {username} signed in.',
+                    data={ 'token': token.decode() }
                 ), 200
         return error_response('User does not exist.'), 404
     except Exception as e:
@@ -59,38 +65,44 @@ def post_signin():
         return error_response('Try again.'), 500
 
 
-@auth_blueprint.route('/auth/logout', methods=['GET'])
-def get_logout():
-    """ GET /auth/logout
-    :return: json
+@auth_blueprint.route('/auth/signout', methods=['GET'])
+def get_signout():
+    """ GET /auth/signout
+    Signs out the user.
+
+    :return: A Flask Response
     """
+
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        auth_token = auth_header[7:]
-        id = User.decode_auth_token(auth_token)
+        token = auth_header[7:]
+        id = User.decode_jwt(token)
         if isinstance(id, int):
             user = User.query.filter_by(id=id).first()
             if not user or not user.active:
                 return error_response('Something went wrong. Please contact us.'), 401
-            return success_response(f'{user.username} logged out.'), 200
+            return success_response(f'User {user.username} signed out.'), 200
         elif isinstance(id, str):
             return error_response(id), 401
-    return error_response('Provide a valid auth token.'), 403
+    return error_response('Provide a valid token.'), 403
 
 
-@auth_blueprint.route('/auth/status', methods=['GET'])
+@auth_blueprint.route('/auth/profile', methods=['GET'])
 def get_status():
-    """ GET /auth/status
-    :return: json
+    """ GET /auth/profile
+    Fetches the user's profile data.
+
+    :return: A Flask Response
     """
+
     auth_header = request.headers.get('Authorization')
     if auth_header:
-        auth_token = auth_header[7:]
-        id = User.decode_auth_token(auth_token)
+        token = auth_header[7:]
+        id = User.decode_jwt(token)
         if not isinstance(id, str):
             user = User.query.filter_by(id=id).first()
             return success_response(
-                f'Retrieved {user.username}\'s status',
+                f"Fetched {user.username}'s profile data.",
                 data={
                     'id': user.id,
                     'username': user.username,
@@ -100,4 +112,4 @@ def get_status():
                 }
             ), 200
         return error_response(id), 401
-    return error_response('Provide a valid auth token.'), 401
+    return error_response('Provide a valid token.'), 401

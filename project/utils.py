@@ -5,11 +5,13 @@ from project.api.models import User
 
 
 def success_response(message, data=None):
-    """ json success response
+    """ Helper function for generating a flask success response with jsonify.
+
     :param message:
     :param data:
-    :return: json
+    :return: flask response
     """
+
     return jsonify({
         'status': 'success',
         'message': message,
@@ -18,10 +20,12 @@ def success_response(message, data=None):
 
 
 def error_response(message='Invalid payload.'):
-    """ json error response
+    """ Helper function for generating a flask error response with jsonify.
+
     :param message:
-    :return: json
+    :return: flask response
     """
+
     return jsonify({
         'status': 'error',
         'message': message
@@ -30,12 +34,14 @@ def error_response(message='Invalid payload.'):
 
 def add_user(username, email, password, created_at=datetime.datetime.utcnow()):
     """ Helper function for adding a new user to the database.
+
     :param username:
     :param email:
     :param password:
     :param created_at:
     :return: User object
     """
+
     new_user = User(
         username=username,
         email=email,

@@ -3,6 +3,7 @@ import os
 
 class BaseConfig:
     """ Base Configurations """
+
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -14,6 +15,7 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     """ Development Configurations """
+
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     BCRYPT_LOG_ROUNDS = 4
@@ -21,6 +23,7 @@ class DevelopmentConfig(BaseConfig):
 
 class TestingConfig(BaseConfig):
     """ Testing Configurations """
+
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL")
@@ -31,5 +34,6 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     """ Production Configurations """
+
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")

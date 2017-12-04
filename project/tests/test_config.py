@@ -14,13 +14,16 @@ class TestDevelopmentConfig(TestCase):
 
     def create_app(self):
         """ Setup Development Configurations.
+
         :return: flask app
         """
+
         app.config.from_object('project.config.DevelopmentConfig')
         return app
 
     def test_app_is_development(self):
         """ Verify app is configured for development. """
+
         self.assertEqual(app.config['SECRET_KEY'], os.getenv('SECRET_KEY'))
         self.assertTrue(app.config['DEBUG'])
         self.assertIsNotNone(current_app)
@@ -34,14 +37,17 @@ class TestTestingConfig(TestCase):
     """ Tests for Testing Configuration. """
 
     def create_app(self):
-        """ Setup Testing Configurations
+        """ Setup Testing Configurations.
+
         :return: flask app
         """
+
         app.config.from_object('project.config.TestingConfig')
         return app
 
     def test_app_is_testing(self):
         """ Verify app is configured for testing. """
+
         self.assertEqual(app.config['SECRET_KEY'], os.getenv('SECRET_KEY'))
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(app.config['TESTING'])
@@ -57,13 +63,16 @@ class TestProductionConfig(TestCase):
 
     def create_app(self):
         """ Setup Production Configurations.
+
         :return: flask app
         """
+
         app.config.from_object('project.config.ProductionConfig')
         return app
 
     def test_app_is_production(self):
         """ Verify app is configured for production. """
+
         self.assertEqual(app.config['SECRET_KEY'], os.getenv('SECRET_KEY'))
         self.assertFalse(app.config['DEBUG'])
         self.assertFalse(app.config['TESTING'])

@@ -5,14 +5,17 @@ from project.utils import add_user, error_response, success_response
 from project import db
 
 
-users_blueprint = Blueprint('users', __name__, template_folder='./templates')
+users_blueprint = Blueprint('users', __name__)
 
 
 @users_blueprint.route('/users', methods=['GET'])
 def get_users():
-    """ GET request route for fetching a list of users.
-    :return: json
+    """ GET /users
+    Fetches a list of users.
+
+    :return: flask response
     """
+
     users = User.query.order_by(User.created_at.desc()).all()
     #TODO use serialize
     user_list = []
@@ -24,16 +27,19 @@ def get_users():
             'created_at': user.created_at
         })
     return success_response(
-        'Users retrieved.',
+        'Users fetched.',
         data={ 'users': user_list }
     ), 200
 
 
 @users_blueprint.route('/users', methods=['POST'])
 def post_users():
-    """ POST request route for adding a new user.
-    :return: json
+    """ POST /users
+    Adds a new user.
+
+    :return: flask response
     """
+
     data = request.get_json()
     if not data:
         return error_response(), 400
@@ -53,10 +59,13 @@ def post_users():
 
 @users_blueprint.route('/users/<user_id>', methods=['GET'])
 def get_user_by_id(user_id):
-    """ GET request for fetching user with specified id
+    """ GET /users/<user_id>
+    Fetches a user with the specified id.
+
     :param user_id:
-    :return: json
+    :return: flask response
     """
+
     try:
         user = User.query.filter_by(id=int(user_id)).first()
         if not user:
