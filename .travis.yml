@@ -20,4 +20,4 @@ before_script:
   - python manage.py recreate_db
 
 script:
-  - python manage.py test
+  - python manage.py cov
