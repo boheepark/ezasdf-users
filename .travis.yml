@@ -10,7 +10,7 @@ env:
   global:
     - APP_SETTINGS="project.config.TestingConfig"
     - DATABASE_TEST_URL=postgresql://postgres:@localhost/users_test
-    - SECRET_KEY=asdf
+    - SECRET_KEY=secret
 
 install:
   - pip install -r requirements.txt

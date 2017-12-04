@@ -6,6 +6,8 @@ class BaseConfig:
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # TODO setup random secret key
+    # change in ezasdf-main docker-compose.yml
     SECRET_KEY = os.getenv('SECRET_KEY')
     BCRYPT_LOG_ROUNDS = 13
     TOKEN_EXPIRATION_DAYS = 30
