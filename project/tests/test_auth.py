@@ -34,8 +34,7 @@ class TestAuthBlueprint(BaseTestCase):
         with self.client:
             response = self.client.post(
                 '/auth/signup',
-                data=json.dumps({
-                }),
+                data=json.dumps({}),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())

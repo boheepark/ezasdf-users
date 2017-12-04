@@ -6,14 +6,10 @@ from project.utils import add_user
 
 
 class TestUserModel(BaseTestCase):
-    """
-    Tests for the User model.
-    """
+    """ Tests for the User model. """
 
     def test_add_user(self):
-        """
-        Verify a new user can be added to the database.
-        """
+        """ Verify a new user can be added to the database. """
         new_user = add_user('test', 'test@test.com', 'test')
         self.assertTrue(new_user.id)
         self.assertEqual(new_user.username, 'test')
@@ -23,9 +19,7 @@ class TestUserModel(BaseTestCase):
         self.assertTrue(new_user.created_at)
 
     def test_add_user_duplicate_username(self):
-        """
-        Verify adding a user with a duplicate username raises an error.
-        """
+        """ Verify adding a user with a duplicate username raises an error. """
         add_user('test', 'test@test.com', 'test')
         duplicate_user = User(
             username='test',
@@ -36,9 +30,7 @@ class TestUserModel(BaseTestCase):
         self.assertRaises(IntegrityError, db.session.commit)
 
     def test_add_user_duplicate_email(self):
-        """
-        Verify adding a user with a duplicate email raises an error.
-        """
+        """ Verify adding a user with a duplicate email raises an error. """
         add_user('test', 'test@test.com', 'test')
         duplicate_user = User(
             username='test2',
@@ -49,25 +41,19 @@ class TestUserModel(BaseTestCase):
         self.assertRaises(IntegrityError, db.session.commit)
 
     def test_passwords_are_random(self):
-        """
-        Verify passwords are random.
-        """
+        """ Verify passwords are random. """
         user1 = add_user('test', 'test@test.com', 'test')
         user2 = add_user('test2', 'test2@test.com', 'test')
         self.assertNotEqual(user1.password, user2.password)
 
     def test_encode_auth_token(self):
-        """
-        Verify encode_auth_token encodes an id to a token.
-        """
+        """ Verify encode_auth_token encodes an id to a token. """
         new_user = add_user('test', 'test@test.com', 'test')
         auth_token = new_user.encode_auth_token(new_user.id)
         self.assertTrue(isinstance(auth_token, bytes))
 
     def test_decode_auth_token(self):
-        """
-        Verify decode_auth_token decodes a token to an id.
-        """
+        """ Verify decode_auth_token decodes a token to an id. """
         new_user = add_user('test', 'test@test.com', 'test')
         auth_token = new_user.encode_auth_token(new_user.id)
         self.assertTrue(isinstance(auth_token, bytes))
