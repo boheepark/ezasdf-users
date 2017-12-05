@@ -111,8 +111,8 @@ def add_admin():
     password: password
     """
 
-    add_user('admin', 'admin@test.com', 'password')
-    user = User.query.filter_by(email='admin@test.com').first()
+    add_user('admin', 'admin@email.com', 'password')
+    user = User.query.filter_by(email='admin@email.com').first()
     user.admin = True
     db.session.commit()
 

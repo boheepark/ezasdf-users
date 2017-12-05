@@ -11,8 +11,10 @@ bcrypt = Bcrypt()
 
 def create_app():
     """ Create Flask App.
+
     :return: flask app
     """
+
     app = Flask(__name__)
     app.config.from_object(os.getenv("APP_SETTINGS"))
     CORS(app)

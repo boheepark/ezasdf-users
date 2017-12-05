@@ -10,17 +10,21 @@ class BaseTestCase(TestCase):
 
     def create_app(self):
         """ Sets up app for testing configurations.
-        :return: flask app
+
+        :return: Flask app
         """
+
         app.config.from_object('project.config.TestingConfig')
         return app
 
     def setUp(self):
         """ Creates database. """
+
         db.create_all()
         db.session.commit()
 
     def tearDown(self):
         """ Removes database. """
+
         db.session.remove()
         db.drop_all()

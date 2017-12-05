@@ -49,8 +49,8 @@ def test():
 def seed_db():
     """ Seeds the database with sample data. """
 
-    db.session.add(User(username='test', email='test@test.com', password='password'))
-    db.session.add(User(username='test2', email='test2@test.com', password='password'))
+    db.session.add(User(username='test', email='test@email.com', password='password'))
+    db.session.add(User(username='test2', email='test2@email.com', password='password'))
     db.session.commit()
 
 
