@@ -11,6 +11,11 @@ auth_blueprint = Blueprint('auth', __name__)
 def post_signup():
     """ POST /auth/signup
     Signs up the new user.
+    requires: {
+        username: 'username'
+        email: 'email',
+        password: 'password'
+    }
 
     :return: flask response
     """
@@ -27,7 +32,7 @@ def post_signup():
             new_user = add_user(username, email, password)
             token = new_user.encode_jwt(new_user.id)
             return success_response(
-                f'User {username} signed up.',
+                f'{email} signed up.',
                 data={ 'token': token.decode() }
             ), 201
         return error_response(
@@ -42,6 +47,9 @@ def post_signup():
 def post_signin():
     """ POST /auth/get_jwt
     Signs in the user and fetches the user's token.
+    requires:
+        email,
+        password
 
     :return: A Flask Response
     """
@@ -49,15 +57,15 @@ def post_signin():
     data = request.get_json()
     if not data:
         return error_response(), 400
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
     try:
-        user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(email=email).first()
         if user and bcrypt.check_password_hash(user.password, password):
             token = user.encode_jwt(user.id)
             if token:
                 return success_response(
-                    f'User {username} signed in.',
+                    f'{email} signed in.',
                     data={ 'token': token.decode() }
                 ), 200
         return error_response(
@@ -72,31 +80,33 @@ def post_signin():
 
 @auth_blueprint.route('/auth/signout', methods=['GET'])
 @authenticate
-def get_signout(id):
+def get_signout(user_id):
     """ GET /auth/signout
     Signs out the user.
 
-    :return: A Flask Response
+    :param user_id:
+    :return: Flask Response
     """
 
-    user = User.query.filter_by(id=id).first()
+    user = User.query.filter_by(id=user_id).first()
     return success_response(
-        f'User {user.username} signed out.'
+        f'{user.email} signed out.'
     ), 200
 
 
 @auth_blueprint.route('/auth/profile', methods=['GET'])
 @authenticate
-def get_profile(id):
+def get_profile(user_id):
     """ GET /auth/profile
     Fetches the user's profile data.
 
-    :return: A Flask Response
+    :param user_id:
+    :return: Flask Response
     """
 
-    user = User.query.filter_by(id=id).first()
+    user = User.query.filter_by(id=user_id).first()
     return success_response(
-        f"Fetched {user.username}'s profile data.",
+        f"Fetched {user.email}'s profile data.",
         data={
             'id': user.id,
             'username': user.username,

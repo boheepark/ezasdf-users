@@ -35,7 +35,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_user('test', 'test@test.com', 'password')
         with self.client:
-            token = get_jwt('test', self.client)
+            token = get_jwt('test@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -56,7 +56,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_admin()
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -78,7 +78,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_admin()
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({ }),
@@ -96,7 +96,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_admin()
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -117,7 +117,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_admin()
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -138,7 +138,7 @@ class TestUsersBlueprint(BaseTestCase):
 
         add_admin()
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -160,7 +160,7 @@ class TestUsersBlueprint(BaseTestCase):
         add_admin()
         add_user('test', 'test@test.com', 'password')
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -183,7 +183,7 @@ class TestUsersBlueprint(BaseTestCase):
         add_admin()
         add_user('test', 'test@test.com', 'password')
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -206,7 +206,7 @@ class TestUsersBlueprint(BaseTestCase):
         add_admin()
         add_user('test', 'test@test.com', 'password')
         with self.client:
-            token = get_jwt('admin', self.client)
+            token = get_jwt('admin@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -231,7 +231,7 @@ class TestUsersBlueprint(BaseTestCase):
         user.active = False
         db.session.commit()
         with self.client:
-            token = get_jwt('test', self.client)
+            token = get_jwt('test@test.com', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({

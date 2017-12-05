@@ -80,15 +80,15 @@ def authenticate(f):
                 'Provide a valid token.'
             ), 403
         token = auth_header[7:]
-        id = User.decode_jwt(token)
-        if isinstance(id, str):
-            return error_response(id), 401
-        user = User.query.filter_by(id=id).first()
+        user_id = User.decode_jwt(token)
+        if isinstance(user_id, str):
+            return error_response(user_id), 401
+        user = User.query.filter_by(id=user_id).first()
         if not user or not user.active:
             return error_response(
                 'Something went wrong. Please contact us.'
             ), 401
-        return f(id, *args, **kwargs)
+        return f(user_id, *args, **kwargs)
 
     return decorated_function
 
@@ -117,10 +117,10 @@ def add_admin():
     db.session.commit()
 
 
-def get_jwt(username, client):
+def get_jwt(email, client):
     """ Calculates the given user's token.
 
-    :param username:
+    :param email:
     :param client:
     :return: str
     """
@@ -128,7 +128,7 @@ def get_jwt(username, client):
     response = client.post(
         '/auth/signin',
         data=json.dumps({
-            'username': f'{username}',
+            'email': email,
             'password': 'password'
         }),
         content_type='application/json'

@@ -13,7 +13,7 @@ def get_users():
     """ GET /users
     Fetches a list of users.
 
-    :return: flask response
+    :return: Flask Response
     """
 
     users = User.query.order_by(User.created_at.desc()).all()
@@ -37,8 +37,16 @@ def get_users():
 def post_users(user_id):
     """ POST /users
     Adds a new user.
+    model:
+        username,
+        email,
+        password,
+        active,
+        admin,
+        created_at
 
-    :return: flask response
+    :param user_id:
+    :return: Flask Response
     """
 
     if not is_admin(user_id):
@@ -72,7 +80,7 @@ def get_user_by_id(user_id):
     Fetches a user with the specified id.
 
     :param user_id:
-    :return: flask response
+    :return: Flask Response
     """
 
     try:
