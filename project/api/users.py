@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from sqlalchemy import exc, or_
 from project.api.models import User
-from project.utils import add_user, error_response, success_response
+from project.api.utils import add_user, error_response, success_response, authenticate, is_admin
 from project import db
 
 
@@ -33,13 +33,18 @@ def get_users():
 
 
 @users_blueprint.route('/users', methods=['POST'])
-def post_users():
+@authenticate
+def post_users(user_id):
     """ POST /users
     Adds a new user.
 
     :return: flask response
     """
 
+    if not is_admin(user_id):
+        return error_response(
+            'You do not have permission to do that.'
+        ), 401
     data = request.get_json()
     if not data:
         return error_response(), 400
@@ -50,8 +55,12 @@ def post_users():
     try:
         if not User.query.filter(or_(User.username == username, User.email == email)).first():
             add_user(username, email, password)
-            return success_response(f'{email} was added!'), 201
-        return error_response('User already exists.'), 400
+            return success_response(
+                f'{email} was added!'
+            ), 201
+        return error_response(
+            'User already exists.'
+        ), 400
     except (exc.IntegrityError, ValueError) as e:
         db.session.rollback()
         return error_response(), 400
@@ -69,7 +78,9 @@ def get_user_by_id(user_id):
     try:
         user = User.query.filter_by(id=int(user_id)).first()
         if not user:
-            return error_response('User does not exist.'), 404
+            return error_response(
+                'User does not exist.'
+            ), 404
         return success_response(
             f'User {user_id} retrieved.',
             data={
@@ -79,4 +90,6 @@ def get_user_by_id(user_id):
             }
         ), 200
     except ValueError:
-        return error_response('User does not exist.'), 404
+        return error_response(
+            'User does not exist.'
+        ), 404

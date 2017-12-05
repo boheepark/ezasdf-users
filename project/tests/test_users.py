@@ -1,7 +1,9 @@
 import datetime
 import json
+from project import db
 from project.tests.base import BaseTestCase
-from project.utils import add_user
+from project.api.models import User
+from project.api.utils import add_user, add_admin, get_jwt
 
 
 class TestUsersBlueprint(BaseTestCase):
@@ -28,33 +30,60 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert200(response)
 
-    def test_post_users(self):
-        """ Verify POST request to /users adds a new user to the database. """
+    def test_post_users_not_admin_user(self):
+        """ Verify non admins cannot add a new user. """
 
+        add_user('test', 'test@test.com', 'password')
         with self.client:
+            token = get_jwt('test', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@test.com',
+                    'username': 'test2',
+                    'email': 'test2@test.com',
                     'password': 'password'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(data['message'], 'You do not have permission to do that.')
+            self.assert401(response)
+
+    def test_post_users(self):
+        """ Verify POST request to /users adds a new user to the database. """
+
+        add_admin()
+        with self.client:
+            token = get_jwt('admin', self.client)
+            response = self.client.post(
+                '/users',
+                data=json.dumps({
+                    'username': 'test2',
+                    'email': 'test2@test.com',
+                    'password': 'password'
+                }),
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], 'test@test.com was added!')
+            self.assertEqual(data['message'], 'test2@test.com was added!')
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
 
     def test_post_users_empty(self):
         """ Verify adding an empty user throws an error. """
 
+        add_admin()
         with self.client:
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
-                data=json.dumps({}),
-                content_type='application/json'
+                data=json.dumps({ }),
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -65,13 +94,17 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_no_username(self):
         """ Verify adding a user without a username throws an error. """
 
+        add_admin()
         with self.client:
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'email': 'test@test.com',
+                    'email': 'test2@test.com',
                     'password': 'password'
-                }), content_type='application/json'
+                }),
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -82,14 +115,17 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_no_email(self):
         """ Verify adding a user without an email throws an error. """
 
+        add_admin()
         with self.client:
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': 'test',
+                    'username': 'test2',
                     'password': 'password'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -100,14 +136,17 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_no_password(self):
         """ Verify adding a user without a password throws an error. """
 
+        add_admin()
         with self.client:
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@test.com'
+                    'username': 'test2',
+                    'email': 'test2@test.com'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -115,19 +154,13 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
 
-    def test_post_users_duplicate(self):
+    def test_post_users_duplicate_user(self):
         """ Verify adding a duplicate user throws an error. """
 
+        add_admin()
+        add_user('test', 'test@test.com', 'password')
         with self.client:
-            self.client.post(
-                '/users',
-                data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@test.com',
-                    'password': 'password'
-                }),
-                content_type='application/json'
-            )
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -135,7 +168,8 @@ class TestUsersBlueprint(BaseTestCase):
                     'email': 'test@test.com',
                     'password': 'password'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -146,16 +180,10 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_duplicate_username(self):
         """ Verify adding a user with a duplicate username throws an error. """
 
+        add_admin()
+        add_user('test', 'test@test.com', 'password')
         with self.client:
-            self.client.post(
-                '/users',
-                data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@test.com',
-                    'password': 'password'
-                }),
-                content_type='application/json'
-            )
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -163,7 +191,8 @@ class TestUsersBlueprint(BaseTestCase):
                     'email': 'test2@test.com',
                     'password': 'password'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -174,16 +203,10 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_duplicate_email(self):
         """ Verify adding a user with a duplicate email throws an error. """
 
+        add_admin()
+        add_user('test', 'test@test.com', 'password')
         with self.client:
-            self.client.post(
-                '/users',
-                data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@test.com',
-                    'password': 'password'
-                }),
-                content_type='application/json'
-            )
+            token = get_jwt('admin', self.client)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
@@ -191,13 +214,38 @@ class TestUsersBlueprint(BaseTestCase):
                     'email': 'test@test.com',
                     'password': 'password'
                 }),
-                content_type='application/json'
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'User already exists.')
             self.assertEqual(response.content_type, 'application/json')
             self.assert400(response)
+
+    def test_post_users_inactive_user(self):
+        """ Verify adding an inactive user throws an error. """
+
+        add_user('test', 'test@test.com', 'password')
+        user = User.query.filter_by(email='test@test.com').first()
+        user.active = False
+        db.session.commit()
+        with self.client:
+            token = get_jwt('test', self.client)
+            response = self.client.post(
+                '/users',
+                data=json.dumps({
+                    'username': 'test2',
+                    'email': 'test2@test.com',
+                    'password': 'password'
+                }),
+                content_type='application/json',
+                headers={ 'Authorization': 'Bearer ' + token }
+            )
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'error')
+            self.assertEqual(data['message'], 'Something went wrong. Please contact us.')
+            self.assert401(response)
 
     def test_get_users_by_id(self):
         """ Verify GET request to /users/{user_id} fetches a user. """
@@ -235,4 +283,3 @@ class TestUsersBlueprint(BaseTestCase):
             self.assertEqual(data['message'], 'User does not exist.')
             self.assertEqual(response.content_type, 'application/json')
             self.assert404(response)
-

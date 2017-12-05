@@ -1,8 +1,8 @@
 from sqlalchemy.exc import IntegrityError
 from project import db
 from project.api.models import User
+from project.api.utils import add_user
 from project.tests.base import BaseTestCase
-from project.utils import add_user
 
 
 class TestUserModel(BaseTestCase):
@@ -18,6 +18,7 @@ class TestUserModel(BaseTestCase):
         self.assertTrue(new_user.password)
         self.assertTrue(new_user.active)
         self.assertTrue(new_user.created_at)
+        self.assertFalse(new_user.admin)
 
     def test_add_user_duplicate_username(self):
         """ Verify adding a user with a duplicate username raises an error. """
