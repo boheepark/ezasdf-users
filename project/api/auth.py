@@ -33,7 +33,7 @@ def post_signup():
             token = new_user.encode_jwt(new_user.id)
             return success_response(
                 f'{email} signed up.',
-                data={ 'token': token.decode() }
+                data={'token': token.decode()}
             ), 201
         return error_response(
             'User already exists.'
@@ -66,7 +66,7 @@ def post_signin():
             if token:
                 return success_response(
                     f'{email} signed in.',
-                    data={ 'token': token.decode() }
+                    data={'token': token.decode()}
                 ), 200
         return error_response(
             'User does not exist.'

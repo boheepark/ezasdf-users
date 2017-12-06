@@ -2,14 +2,13 @@ import datetime
 import json
 from project import db
 from project.tests.base import BaseTestCase
-from project.api.models import User
 from project.api.utils import add_user, add_admin, get_jwt
 from project.tests.utils import (
-    TEST_USERNAME,
-    TEST_USERNAME2,
-    TEST_EMAIL,
-    TEST_EMAIL2,
-    TEST_PASSWORD
+    USERNAME,
+    USERNAME2,
+    EMAIL,
+    EMAIL2,
+    PASSWORD
 )
 
 
@@ -20,8 +19,8 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify GET request to /users returns a list of users ordered by created_at. """
 
         created = datetime.datetime.utcnow() + datetime.timedelta(-30)
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD, created)
-        user2 = add_user(TEST_USERNAME2, TEST_EMAIL2, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD, created)
+        user2 = add_user(USERNAME2, EMAIL2, PASSWORD)
         with self.client:
             response = self.client.get('/users')
             data = json.loads(response.data.decode())
@@ -40,18 +39,18 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_with_not_admin_user_token(self):
         """ Verify non admins cannot add a new user. """
 
-        user = add_user(TEST_USERNAME, TEST_EMAIL, 'password')
+        user = add_user(USERNAME, EMAIL, 'password')
         with self.client:
             token = get_jwt(self.client, user.email)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
                     'username': 'test2',
-                    'email': TEST_EMAIL2,
-                    'password': TEST_PASSWORD
+                    'email': EMAIL2,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -67,16 +66,16 @@ class TestUsersBlueprint(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': TEST_USERNAME,
-                    'email': TEST_EMAIL,
-                    'password': TEST_PASSWORD
+                    'username': USERNAME,
+                    'email': EMAIL,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'{TEST_EMAIL} was added!')
+            self.assertEqual(data['message'], f'{EMAIL} was added!')
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
 
@@ -88,9 +87,9 @@ class TestUsersBlueprint(BaseTestCase):
             token = get_jwt(self.client, admin.email)
             response = self.client.post(
                 '/users',
-                data=json.dumps({ }),
+                data=json.dumps({}),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -107,11 +106,11 @@ class TestUsersBlueprint(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'email': TEST_EMAIL,
-                    'password': TEST_PASSWORD
+                    'email': EMAIL,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -128,11 +127,11 @@ class TestUsersBlueprint(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': TEST_USERNAME,
-                    'password': TEST_PASSWORD
+                    'username': USERNAME,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -149,11 +148,11 @@ class TestUsersBlueprint(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': TEST_USERNAME,
-                    'email': TEST_EMAIL
+                    'username': USERNAME,
+                    'email': EMAIL
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -165,7 +164,7 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify adding a duplicate user throws an error. """
 
         admin = add_admin()
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
             token = get_jwt(self.client, admin.email)
             response = self.client.post(
@@ -176,7 +175,7 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': user.password
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -188,18 +187,18 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify adding a user with a duplicate username throws an error. """
 
         admin = add_admin()
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
             token = get_jwt(self.client, admin.email)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
                     'username': user.username,
-                    'email': TEST_EMAIL2,
-                    'password': TEST_PASSWORD
+                    'email': EMAIL2,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -211,18 +210,18 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify adding a user with a duplicate email throws an error. """
 
         admin = add_admin()
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
             token = get_jwt(self.client, admin.email)
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': TEST_USERNAME2,
+                    'username': USERNAME2,
                     'email': user.email,
-                    'password': TEST_PASSWORD
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -233,7 +232,7 @@ class TestUsersBlueprint(BaseTestCase):
     def test_post_users_inactive_user(self):
         """ Verify adding an inactive user throws an error. """
 
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD)
         user.active = False
         db.session.commit()
         with self.client:
@@ -241,12 +240,12 @@ class TestUsersBlueprint(BaseTestCase):
             response = self.client.post(
                 '/users',
                 data=json.dumps({
-                    'username': TEST_USERNAME2,
-                    'email': TEST_EMAIL2,
-                    'password': TEST_PASSWORD
+                    'username': USERNAME2,
+                    'email': EMAIL2,
+                    'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={ 'Authorization': 'Bearer ' + token }
+                headers={'Authorization': 'Bearer ' + token}
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -256,12 +255,12 @@ class TestUsersBlueprint(BaseTestCase):
     def test_get_users_by_id(self):
         """ Verify GET request to /users/{user_id} fetches a user. """
 
-        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
+        user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
             response = self.client.get(f'/users/{user.id}')
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'User {user.id} retrieved.')
+            self.assertEqual(data['message'], f'User {user.id} fetched.')
             self.assertEqual(data['data']['username'], 'test')
             self.assertEqual(data['data']['email'], 'test@email.com')
             self.assertIn('created_at', data['data'])

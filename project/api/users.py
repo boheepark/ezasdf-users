@@ -4,7 +4,6 @@ from project.api.models import User
 from project.api.utils import add_user, error_response, success_response, authenticate, is_admin
 from project import db
 
-
 users_blueprint = Blueprint('users', __name__)
 
 
@@ -17,7 +16,7 @@ def get_users():
     """
 
     users = User.query.order_by(User.created_at.desc()).all()
-    #TODO use serialize
+    # TODO use serialize
     user_list = []
     for user in users:
         user_list.append({
@@ -28,7 +27,7 @@ def get_users():
         })
     return success_response(
         'Users fetched.',
-        data={ 'users': user_list }
+        data={'users': user_list}
     ), 200
 
 
@@ -59,7 +58,7 @@ def post_users(user_id):
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    #TODO setup validation
+    # TODO setup validation
     try:
         if not User.query.filter(or_(User.username == username, User.email == email)).first():
             add_user(username, email, password)
@@ -90,7 +89,7 @@ def get_user_by_id(user_id):
                 'User does not exist.'
             ), 404
         return success_response(
-            f'User {user_id} retrieved.',
+            f'User {user_id} fetched.',
             data={
                 'username': user.username,
                 'email': user.email,

@@ -96,7 +96,7 @@ def authenticate(f):
 def is_admin(user_id):
     """ Determine if the user with the specified id is an admin.
 
-    :param id:
+    :param user_id:
     :return: boolean
     """
 
@@ -121,8 +121,8 @@ def add_admin():
 def get_jwt(client, email):
     """ Calculates the given user's token.
 
-    :param email:
     :param client:
+    :param email:
     :return: str
     """
 
