@@ -17,8 +17,15 @@ class DevelopmentConfig(BaseConfig):
     """ Development Configurations """
 
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     BCRYPT_LOG_ROUNDS = 4
+
+
+class StagingConfig(BaseConfig):
+    """ Staging Configurations """
+
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 
 class TestingConfig(BaseConfig):
@@ -26,7 +33,7 @@ class TestingConfig(BaseConfig):
 
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_TEST_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_TEST_URL')
     BCRYPT_LOG_ROUNDS = 4
     TOKEN_EXPIRATION_DAYS = 0
     TOKEN_EXPIRATION_SECONDS = 3
@@ -36,4 +43,4 @@ class ProductionConfig(BaseConfig):
     """ Production Configurations """
 
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
