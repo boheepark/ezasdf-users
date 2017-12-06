@@ -111,13 +111,14 @@ def add_admin():
     password: password
     """
 
-    add_user('admin', 'admin@email.com', 'password')
+    admin = add_user('admin', 'admin@email.com', 'password')
     user = User.query.filter_by(email='admin@email.com').first()
     user.admin = True
     db.session.commit()
+    return admin
 
 
-def get_jwt(email, client):
+def get_jwt(client, email):
     """ Calculates the given user's token.
 
     :param email:

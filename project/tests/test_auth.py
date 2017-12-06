@@ -2,9 +2,14 @@ import json
 import time
 from project import db
 from project.api.utils import add_user, get_jwt
-from project.api.models import User
 from project.tests.base import BaseTestCase
-
+from project.tests.utils import (
+    TEST_USERNAME,
+    TEST_USERNAME2,
+    TEST_EMAIL,
+    TEST_EMAIL2,
+    TEST_PASSWORD
+)
 
 class TestAuthBlueprint(BaseTestCase):
     """ Tests for the auth blueprint. """
@@ -16,15 +21,15 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], 'test@email.com signed up.')
+            self.assertEqual(data['message'], f'{TEST_EMAIL} signed up.')
             self.assertTrue(data['data']['token'])
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
@@ -51,8 +56,8 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
@@ -69,8 +74,8 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json',
             )
@@ -87,8 +92,8 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@email.com'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL
                 }),
                 content_type='application/json'
             )
@@ -105,18 +110,18 @@ class TestAuthBlueprint(BaseTestCase):
             self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test2@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL2,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
@@ -133,18 +138,18 @@ class TestAuthBlueprint(BaseTestCase):
             self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
             response = self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test2',
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME2,
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
@@ -161,23 +166,23 @@ class TestAuthBlueprint(BaseTestCase):
             self.client.post(
                 '/auth/signup',
                 data=json.dumps({
-                    'username': 'test',
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'username': TEST_USERNAME,
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
             response = self.client.post(
                 '/auth/signin',
                 data=json.dumps({
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], 'test@email.com signed in.')
+            self.assertEqual(data['message'], f'{TEST_EMAIL} signed in.')
             self.assertTrue(data['data']['token'])
             self.assertEqual(response.content_type, 'application/json')
             self.assert200(response)
@@ -189,8 +194,8 @@ class TestAuthBlueprint(BaseTestCase):
             response = self.client.post(
                 '/auth/signin',
                 data=json.dumps({
-                    'email': 'test@email.com',
-                    'password': 'password'
+                    'email': TEST_EMAIL,
+                    'password': TEST_PASSWORD
                 }),
                 content_type='application/json'
             )
@@ -201,19 +206,19 @@ class TestAuthBlueprint(BaseTestCase):
             self.assert404(response)
 
     def test_get_signout(self):
-        """ Verify users can signout. """
+        """ Verify users can sign out. """
 
-        add_user('test', 'test@email.com', 'password')
+        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
         with self.client:
-            token = get_jwt('test@email.com', self.client)
-            signout_response = self.client.get(
+            token = get_jwt(self.client, user.email)
+            response = self.client.get(
                 '/auth/signout',
                 headers={ 'Authorization': 'Bearer ' + token }
             )
-            data = json.loads(signout_response.data.decode())
+            data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], 'test@email.com signed out.')
-            self.assert200(signout_response)
+            self.assertEqual(data['message'], f'{user.email} signed out.')
+            self.assert200(response)
 
     def test_get_signout_invalid_user(self):
         """ Verify signing out a user with an invalid token throws an error. """
@@ -232,55 +237,54 @@ class TestAuthBlueprint(BaseTestCase):
     def test_get_signout_user_with_expired_token(self):
         """ Verify signing out a user with an expired token throws an error. """
 
-        add_user('test', 'test@email.com', 'password')
+        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
         with self.client:
-            token = get_jwt('test@email.com', self.client)
+            token = get_jwt(self.client, user.email)
             time.sleep(4)
-            signout_response = self.client.get(
+            response = self.client.get(
                 '/auth/signout',
                 headers={ 'Authorization': 'Bearer ' + token }
             )
-            data = json.loads(signout_response.data.decode())
+            data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'Signature expired. Signin again.')
-            self.assert401(signout_response)
+            self.assert401(response)
 
     def test_get_signout_inactive_user(self):
         """ Verify signing out an inactive user throws an error. """
 
-        add_user('test', 'test@email.com', 'password')
-        user = User.query.filter_by(email='test@email.com').first()
+        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
         user.active = False
         db.session.commit()
         with self.client:
-            token = get_jwt('test@test.com', self.client)
-            signout_response = self.client.get(
+            token = get_jwt(self.client, user.email)
+            response = self.client.get(
                 '/auth/signout',
                 headers={ 'Authorization': 'Bearer ' + token }
             )
-            data = json.loads(signout_response.data.decode())
+            data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'Something went wrong. Please contact us.')
-            self.assert401(signout_response)
+            self.assert401(response)
 
     def test_get_profile(self):
         """ Verify user can get profile with valid token. """
 
-        add_user('test', 'test@email.com', 'password')
+        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
         with self.client:
-            token = get_jwt('test@email.com', self.client)
-            profile_response = self.client.get(
+            token = get_jwt(self.client, user.email)
+            response = self.client.get(
                 '/auth/profile',
                 headers={ 'Authorization': 'Bearer ' + token }
             )
-            data = json.loads(profile_response.data.decode())
+            data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], "Fetched test@email.com's profile data.")
-            self.assertEqual(data['data']['username'], 'test')
-            self.assertEqual(data['data']['email'], 'test@email.com')
+            self.assertEqual(data['message'], f"Fetched {user.email}'s profile data.")
+            self.assertEqual(data['data']['username'], user.username)
+            self.assertEqual(data['data']['email'], user.email)
             self.assertTrue(data['data']['active'])
             self.assertTrue(data['data']['created_at'])
-            self.assert200(profile_response)
+            self.assert200(response)
 
     def test_get_profile_invalid_token(self):
         """ Verify user cannot get profile with invalid token. """
@@ -299,17 +303,16 @@ class TestAuthBlueprint(BaseTestCase):
     def test_get_profile_inactive_user(self):
         """ Verify getting the profile of an inactive user throws an error. """
 
-        add_user('test', 'test@email.com', 'password')
-        user = User.query.filter_by(email='test@email.com').first()
+        user = add_user(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD)
         user.active = False
         db.session.commit()
         with self.client:
-            token = get_jwt('test@email.com', self.client)
-            profile_response = self.client.get(
+            token = get_jwt(self.client, user.email)
+            response = self.client.get(
                 '/auth/profile',
                 headers={ 'Authorization': 'Bearer ' + token }
             )
-            data = json.loads(profile_response.data.decode())
+            data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'Something went wrong. Please contact us.')
-            self.assert401(profile_response)
+            self.assert401(response)
