@@ -86,9 +86,10 @@ celerybeat-schedule
 .venv
 venv/
 ENV/
+activate.cmd
 
 # setup
-asdf.cmd
+setup.cmd
 
 # Spyder project settings
 .spyderproject
