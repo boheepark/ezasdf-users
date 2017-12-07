@@ -9,7 +9,7 @@ services:
   - postgresql
 
 
-cache: pip
+#cache: pip
 
 
 env:
