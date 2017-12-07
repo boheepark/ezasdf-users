@@ -89,7 +89,6 @@ ENV/
 activate.cmd
 
 # setup
-asdf.cmd
 setup.cmd
 
 # Spyder project settings
