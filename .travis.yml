@@ -9,6 +9,9 @@ services:
   - postgresql
 
 
+cache: pip
+
+
 env:
   global:
     - APP_SETTINGS="project.config.TestingConfig"
