@@ -1,10 +1,19 @@
+# asdf-users/project/api/users.py
+
+
 from flask import Blueprint, request
 from sqlalchemy import exc, or_
 from project.api.models import User
 from project.api.utils import add_user, error_response, success_response, authenticate, is_admin
 from project import db
 
+
 users_blueprint = Blueprint('users', __name__)
+
+
+@users_blueprint.route('/users/ping', methods=['GET'])
+def ping_pong():
+    return success_response('pong!')
 
 
 @users_blueprint.route('/users', methods=['GET'])
