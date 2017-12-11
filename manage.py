@@ -1,5 +1,6 @@
 # asdf-users/manage.py
 
+
 import unittest
 import coverage
 
@@ -9,13 +10,17 @@ from flask_migrate import Migrate, MigrateCommand
 from project import create_app, db
 from project.api.models import User
 
+
 COV = coverage.coverage(branch=True, include='project/*', omit=['project/tests/*'])
 COV.start()
 
+
 app = create_app()
+
 
 manager = Manager(app)
 migrate = Migrate(app, db)
+
 
 manager.add_command('db', MigrateCommand)
 
