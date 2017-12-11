@@ -14,7 +14,7 @@ users_blueprint = Blueprint('users', __name__)
 @users_blueprint.route('/users/ping', methods=['GET'])
 def ping_pong():
     """ GET /users/ping
-    ping pong
+    Sanity check
 
     :return: Flask Response
     """
