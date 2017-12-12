@@ -78,7 +78,7 @@ def post_users(user_id):
         if not User.query.filter(or_(User.username == username, User.email == email)).first():
             add_user(username, email, password)
             return success_response(
-                f'{email} was added!'
+                '{email} was added!'.format(email=email)
             ), 201
         return error_response(
             'User already exists.'
@@ -104,7 +104,7 @@ def get_user_by_id(user_id):
                 'User does not exist.'
             ), 404
         return success_response(
-            f'User {user_id} fetched.',
+            'User {user_id} fetched.'.format(user_id=user_id),
             data={
                 'username': user.username,
                 'email': user.email,
