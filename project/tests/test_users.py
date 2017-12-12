@@ -1,8 +1,16 @@
+# ezasdf-users/project/tests/test_users.py
+
+
 import datetime
 import json
+
 from project import db
 from project.tests.base import BaseTestCase
-from project.api.utils import add_user, add_admin, get_jwt
+from project.api.utils import (
+    add_user,
+    add_admin,
+    get_jwt
+)
 from project.tests.utils import (
     USERNAME,
     USERNAME2,

@@ -1,8 +1,9 @@
+# ezasdf-users/project/tests/base.py
+
+
 from flask_testing import TestCase
+
 from project import create_app, db
-
-
-app = create_app()
 
 
 class BaseTestCase(TestCase):
@@ -14,6 +15,7 @@ class BaseTestCase(TestCase):
         :return: Flask app
         """
 
+        app = create_app()
         app.config.from_object('project.config.TestingConfig')
         return app
 
