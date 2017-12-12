@@ -1,4 +1,10 @@
-FROM python:3.6.2
+FROM python:3.6.3
+
+# install environment dependencies
+RUN apt-get update -yqq \
+    && apt-get install -yqq --no-install-recommends \
+        netcat \
+    && apt-get -q clean
 
 # set working directory
 RUN mkdir -p /usr/src/app
@@ -19,5 +25,4 @@ ADD . /usr/src/app
 
 # run server
 #CMD ["./entrypoint.sh"]
-#CMD python manage.py runserver -h 0.0.0.0
 CMD flask run -h 0.0.0.0
