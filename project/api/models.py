@@ -1,6 +1,11 @@
+# ezasdf-users/project/api/models.py
+
+
 import datetime
-from flask import current_app
+
 import jwt
+from flask import current_app
+
 from project import db, bcrypt
 
 
