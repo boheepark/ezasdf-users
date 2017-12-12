@@ -19,4 +19,5 @@ ADD . /usr/src/app
 
 # run server
 #CMD ["./entrypoint.sh"]
-CMD python manage.py runserver -h 0.0.0.0
+#CMD python manage.py runserver -h 0.0.0.0
+CMD flask run -h 0.0.0.0
