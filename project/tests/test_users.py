@@ -83,7 +83,7 @@ class TestUsersBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'{EMAIL} was added!')
+            self.assertEqual(data['message'], '{email} was added!'.format(email=EMAIL))
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
 
@@ -265,10 +265,10 @@ class TestUsersBlueprint(BaseTestCase):
 
         user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
-            response = self.client.get(f'/users/{user.id}')
+            response = self.client.get('/users/{user_id}'.format(user_id=user.id))
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'User {user.id} fetched.')
+            self.assertEqual(data['message'], 'User {user_id} fetched.'.format(user_id=user.id))
             self.assertEqual(data['data']['username'], 'test')
             self.assertEqual(data['data']['email'], 'test@email.com')
             self.assertIn('created_at', data['data'])
