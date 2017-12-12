@@ -3,6 +3,7 @@
 
 from flask import Blueprint, request
 from sqlalchemy import exc, or_
+
 from project.api.models import User
 from project.api.utils import add_user, error_response, success_response, authenticate, is_admin
 from project import db
@@ -19,7 +20,7 @@ def get_users_ping():
     :return: Flask Response
     """
 
-    return success_response('pong!')
+    return success_response('pong!'), 200
 
 
 @users_blueprint.route('/users', methods=['GET'])
@@ -83,7 +84,7 @@ def post_users(user_id):
         return error_response(
             'User already exists.'
         ), 400
-    except (exc.IntegrityError, ValueError) as e:
+    except (exc.IntegrityError, ValueError):
         db.session.rollback()
         return error_response(), 400
 
