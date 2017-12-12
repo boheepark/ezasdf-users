@@ -16,7 +16,7 @@ class User(db.Model):
     admin = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self,username, email, password, created_at=datetime.datetime.utcnow()):
+    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
         """ __init__
 
         :param username:
