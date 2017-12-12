@@ -17,6 +17,7 @@ env:
     - APP_SETTINGS="project.config.TestingConfig"
     - DATABASE_TEST_URL=postgresql://postgres:@localhost/users_test
     - SECRET_KEY=secret
+    - FLASK_APP=ezasdf_users.py
 
 
 install:
@@ -25,8 +26,8 @@ install:
 
 before_script:
   - psql -c 'create database users_test;' -U postgres
-  - python manage.py recreate_db
+  - flask recreate_db
 
 
 script:
-  - python manage.py cov
+  - flask test --cov
