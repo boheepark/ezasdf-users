@@ -31,19 +31,12 @@ def get_users():
     :return: Flask Response
     """
 
-    users = User.query.order_by(User.created_at.desc()).all()
     # TODO use serialize
-    user_list = []
-    for user in users:
-        user_list.append({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'created_at': user.created_at
-        })
     return success_response(
         'Users fetched.',
-        data={'users': user_list}
+        data={
+            'users': [user.to_json() for user in User.query.order_by(User.created_at.desc()).all()]
+        }
     ), 200
 
 
