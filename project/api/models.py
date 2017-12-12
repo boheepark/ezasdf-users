@@ -35,6 +35,15 @@ class User(db.Model):
         self.password = bcrypt.generate_password_hash(password, current_app.config.get('BCRYPT_LOG_ROUNDS')).decode()
         self.created_at = created_at
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'active': self.active,
+            'created_at': self.created_at
+        }
+
     def encode_jwt(self, user_id):
         """ Generates the jwt token.
 
