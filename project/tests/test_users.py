@@ -23,6 +23,16 @@ from project.tests.utils import (
 class TestUsersBlueprint(BaseTestCase):
     """ Tests for the users blueprint. """
 
+    def test_get_users_ping(self):
+        """ Sanity check. """
+
+        with self.client:
+            response = self.client.get('/users/ping')
+            data = json.loads(response.data.decode())
+            self.assertEqual(data['status'], 'success')
+            self.assertEqual(data['message'], 'pong!')
+            self.assert200(response)
+
     def test_get_users(self):
         """ Verify GET request to /users returns a list of users ordered by created_at. """
 
