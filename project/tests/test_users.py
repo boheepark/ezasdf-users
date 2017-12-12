@@ -27,7 +27,9 @@ class TestUsersBlueprint(BaseTestCase):
         """ Sanity check. """
 
         with self.client:
-            response = self.client.get('/users/ping')
+            response = self.client.get(
+                '/users/ping'
+            )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
             self.assertEqual(data['message'], 'pong!')
@@ -40,7 +42,9 @@ class TestUsersBlueprint(BaseTestCase):
         user = add_user(USERNAME, EMAIL, PASSWORD, created)
         user2 = add_user(USERNAME2, EMAIL2, PASSWORD)
         with self.client:
-            response = self.client.get('/users')
+            response = self.client.get(
+                '/users'
+            )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
             self.assertEqual(data['message'], 'Users fetched.')
@@ -68,7 +72,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -89,7 +95,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
@@ -107,7 +115,9 @@ class TestUsersBlueprint(BaseTestCase):
                 '/users',
                 data=json.dumps({}),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -128,7 +138,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -149,7 +161,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -170,7 +184,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'email': EMAIL
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -193,7 +209,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': user.password
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -216,7 +234,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -239,7 +259,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -263,7 +285,9 @@ class TestUsersBlueprint(BaseTestCase):
                     'password': PASSWORD
                 }),
                 content_type='application/json',
-                headers={'Authorization': 'Bearer ' + token}
+                headers={
+                    'Authorization': 'Bearer ' + token
+                }
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
@@ -275,7 +299,11 @@ class TestUsersBlueprint(BaseTestCase):
 
         user = add_user(USERNAME, EMAIL, PASSWORD)
         with self.client:
-            response = self.client.get('/users/{user_id}'.format(user_id=user.id))
+            response = self.client.get(
+                '/users/{user_id}'.format(
+                    user_id=user.id
+                )
+            )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
             self.assertEqual(data['message'], 'User {user_id} fetched.'.format(user_id=user.id))
@@ -289,7 +317,9 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify fetching an id that doesn't exist throws an error. """
 
         with self.client:
-            response = self.client.get('/users/999')
+            response = self.client.get(
+                '/users/999'
+            )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'User does not exist.')
@@ -300,7 +330,9 @@ class TestUsersBlueprint(BaseTestCase):
         """ Verify requesting the invalid id 'blah' throws an error. """
 
         with self.client:
-            response = self.client.get('/users/blah')
+            response = self.client.get(
+                '/users/blah'
+            )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'error')
             self.assertEqual(data['message'], 'User does not exist.')
