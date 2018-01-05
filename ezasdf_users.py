@@ -43,7 +43,7 @@ def test(coverage):
     tests = unittest.TestLoader().discover('project/tests')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     if result.wasSuccessful():
-        if cov:
+        if coverage:
             COV.stop()
             COV.save()
             print('Coverage Summary:')
