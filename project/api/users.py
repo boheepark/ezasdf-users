@@ -1,10 +1,26 @@
+# asdf-users/project/api/users.py
+
+
 from flask import Blueprint, request
 from sqlalchemy import exc, or_
+
 from project.api.models import User
 from project.api.utils import add_user, error_response, success_response, authenticate, is_admin
 from project import db
 
+
 users_blueprint = Blueprint('users', __name__)
+
+
+@users_blueprint.route('/users/ping', methods=['GET'])
+def get_users_ping():
+    """ GET /users/ping
+    Sanity check
+
+    :return: Flask Response
+    """
+
+    return success_response('pong!'), 200
 
 
 @users_blueprint.route('/users', methods=['GET'])
@@ -15,19 +31,12 @@ def get_users():
     :return: Flask Response
     """
 
-    users = User.query.order_by(User.created_at.desc()).all()
     # TODO use serialize
-    user_list = []
-    for user in users:
-        user_list.append({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'created_at': user.created_at
-        })
     return success_response(
         'Users fetched.',
-        data={'users': user_list}
+        data={
+            'users': [user.to_json() for user in User.query.order_by(User.created_at.desc()).all()]
+        }
     ), 200
 
 
@@ -63,12 +72,12 @@ def post_users(user_id):
         if not User.query.filter(or_(User.username == username, User.email == email)).first():
             add_user(username, email, password)
             return success_response(
-                f'{email} was added!'
+                '{email} was added!'.format(email=email)
             ), 201
         return error_response(
             'User already exists.'
         ), 400
-    except (exc.IntegrityError, ValueError) as e:
+    except (exc.IntegrityError, ValueError):
         db.session.rollback()
         return error_response(), 400
 
@@ -89,7 +98,7 @@ def get_user_by_id(user_id):
                 'User does not exist.'
             ), 404
         return success_response(
-            f'User {user_id} fetched.',
+            'User {user_id} fetched.'.format(user_id=user_id),
             data={
                 'username': user.username,
                 'email': user.email,

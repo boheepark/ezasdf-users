@@ -1,5 +1,9 @@
+# ezasdf-users/project/api/auth.py
+
+
 from flask import Blueprint, request
 from sqlalchemy import exc, or_
+
 from project import db, bcrypt
 from project.api.models import User
 from project.api.utils import add_user, error_response, success_response, authenticate
@@ -32,13 +36,13 @@ def post_signup():
             new_user = add_user(username, email, password)
             token = new_user.encode_jwt(new_user.id)
             return success_response(
-                f'{email} signed up.',
+                '{email} signed up.'.format(email=email),
                 data={'token': token.decode()}
             ), 201
         return error_response(
             'User already exists.'
         ), 400
-    except (exc.IntegrityError, ValueError) as e:
+    except (exc.IntegrityError, ValueError):
         db.session.rollback()
         return error_response(), 400
 
@@ -65,7 +69,7 @@ def post_signin():
             token = user.encode_jwt(user.id)
             if token:
                 return success_response(
-                    f'{email} signed in.',
+                    '{email} signed in.'.format(email=email),
                     data={'token': token.decode()}
                 ), 200
         return error_response(
@@ -90,7 +94,7 @@ def get_signout(user_id):
 
     user = User.query.filter_by(id=user_id).first()
     return success_response(
-        f'{user.email} signed out.'
+        '{email} signed out.'.format(email=user.email)
     ), 200
 
 
@@ -106,7 +110,7 @@ def get_profile(user_id):
 
     user = User.query.filter_by(id=user_id).first()
     return success_response(
-        f"Fetched {user.email}'s profile data.",
+        "Fetched {email}'s profile data.".format(email=user.email),
         data={
             'id': user.id,
             'username': user.username,

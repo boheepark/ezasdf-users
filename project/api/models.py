@@ -1,6 +1,11 @@
+# ezasdf-users/project/api/models.py
+
+
 import datetime
-from flask import current_app
+
 import jwt
+from flask import current_app
+
 from project import db, bcrypt
 
 
@@ -16,7 +21,7 @@ class User(db.Model):
     admin = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self,username, email, password, created_at=datetime.datetime.utcnow()):
+    def __init__(self, username, email, password, created_at=datetime.datetime.utcnow()):
         """ __init__
 
         :param username:
@@ -29,6 +34,15 @@ class User(db.Model):
         self.email = email
         self.password = bcrypt.generate_password_hash(password, current_app.config.get('BCRYPT_LOG_ROUNDS')).decode()
         self.created_at = created_at
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'active': self.active,
+            'created_at': self.created_at
+        }
 
     def encode_jwt(self, user_id):
         """ Generates the jwt token.

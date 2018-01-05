@@ -1,9 +1,12 @@
+# asdf-users/project/__init__.py
+
+
 import os
+
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -12,7 +15,7 @@ bcrypt = Bcrypt()
 def create_app():
     """ Create Flask App.
 
-    :return: flask app
+    :return: Flask app
     """
 
     app = Flask(__name__)

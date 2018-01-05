@@ -1,5 +1,9 @@
+# ezasdf-users/project/tests/test_auth.py
+
+
 import json
 import time
+
 from project import db
 from project.api.utils import add_user, get_jwt
 from project.tests.base import BaseTestCase
@@ -30,7 +34,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'{EMAIL} signed up.')
+            self.assertEqual(data['message'], '{email} signed up.'.format(email=EMAIL))
             self.assertTrue(data['data']['token'])
             self.assertEqual(response.content_type, 'application/json')
             self.assertEqual(response.status_code, 201)
@@ -183,7 +187,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'{EMAIL} signed in.')
+            self.assertEqual(data['message'], '{email} signed in.'.format(email=EMAIL))
             self.assertTrue(data['data']['token'])
             self.assertEqual(response.content_type, 'application/json')
             self.assert200(response)
@@ -218,7 +222,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f'{user.email} signed out.')
+            self.assertEqual(data['message'], '{email} signed out.'.format(email=user.email))
             self.assert200(response)
 
     def test_get_signout_invalid_user(self):
@@ -280,7 +284,7 @@ class TestAuthBlueprint(BaseTestCase):
             )
             data = json.loads(response.data.decode())
             self.assertEqual(data['status'], 'success')
-            self.assertEqual(data['message'], f"Fetched {user.email}'s profile data.")
+            self.assertEqual(data['message'], "Fetched {email}'s profile data.".format(email=user.email))
             self.assertEqual(data['data']['username'], user.username)
             self.assertEqual(data['data']['email'], user.email)
             self.assertTrue(data['data']['active'])
