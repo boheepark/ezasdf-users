@@ -12,4 +12,4 @@ echo "PostgreSQL started"
 
 flask recreate_db
 flask seed_db
-flask run -h 0.0.0.0
+gunicorn -b 0.0.0.0:5000 ezasdf_users:app
